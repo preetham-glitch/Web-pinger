@@ -28,24 +28,21 @@ def resolve_domain():
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
     }
     
-    # 1. Follow HTTP 301/302 redirects
     response = requests.get(INITIAL_URL, headers=headers, allow_redirects=True, timeout=25)
     final_url = response.url
 
-    # 2. Check for HTML meta-refresh or JS redirects if the base URL didn't change
+    # Check for meta-refresh redirects
     text = response.text
     meta_match = re.search(r'content=["\']\d+;\s*url=([^"\']+)["\']', text, re.IGNORECASE)
     if meta_match:
         final_url = meta_match.group(1).strip()
 
-    # Extract base domain root (e.g. https://www.1tamilmv.xyz/)
     parsed = urlparse(final_url)
-    clean_url = f"{parsed.scheme}://{parsed.netloc}/"
-    return clean_url
+    return f"{parsed.scheme}://{parsed.netloc}/"
 
 def main():
     if not BOT_TOKEN or not CHAT_ID:
-        print("Missing TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID.")
+        print("Missing credentials.")
         return
 
     try:
